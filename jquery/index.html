@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drupal 7 Services usages in jQuery</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      var endpoint = 'https://dev-npmjs-drupal7.pantheonsite.io/api/rest/v1';
+
+      function api_examples_set(name, value) {
+        name = 'api_examples_' + name;
+        localStorage.setItem(name, value);
+      }
+
+      function api_examples_get(name) {
+        //return service[name];
+        name = 'api_examples_' + name;
+        return localStorage.getItem(name)
+      }
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#user_token').click(function() {
+        $.ajax({
+          url: endpoint + '/user/token.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response){
+            api_examples_set('token', response.token);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_login').click(function() {
+        var data = {
+          username: 'api',
+          password: 'api'
+        };
+        $.ajax({
+          url: endpoint + '/user/login.json',
+          method: 'POST',
+          dataType: 'json',
+          data: JSON.stringify(data),
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function (response) {
+            api_examples_set('token', response.token);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function (request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_logout').click(function() {
+        $.ajax({
+          url: endpoint + '/user/logout.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response){
+            api_examples_set('token', '');
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#system_connect').click(function() {
+        $.ajax({
+          url: endpoint + '/system/connect.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#user_index').click(function() {
+        var params = {
+          parameters: {
+            status: 1
+          },
+          fields: 'uid,name,mail,roles,files,timezone',
+          sort: 'name',
+          direction: 'ASC',
+          page: 0,
+          pagesize: 5
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          url: endpoint + '/entity_user.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_register').click(function() {
+        var time = (new Date).getTime();
+        var data = {
+          name: 'TEST' + time,
+          pass: 'password',
+          mail: 'TEST' + time + '@example.com',
+          status: true
+        };
+        $.ajax({
+          url: endpoint + '/user/register.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response) {
+            api_examples_set('uid', response.uid);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_create').click(function() {
+        var time = (new Date).getTime();
+        var data = {
+          name: 'TEST' + time,
+          pass: 'password',
+          mail: 'TEST' + time + '@example.com',
+          status: true
+        };
+        $.ajax({
+          url: endpoint + '/user.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('uid', response.uid);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_retrieve').click(function() {
+        var params = {
+          fields: 'uid,name,mail,roles,files,timezone'
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          cache: false,
+          url: endpoint + '/entity_user/' + api_examples_get('uid') + '.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_update').click(function() {
+        var time = (new Date).getTime();
+        var data = {
+          name: 'TEST' + time,
+          pass: 'password',
+          mail: 'TEST' + time + '@example.com',
+          status: true
+        };
+        $.ajax({
+          url: endpoint + '/user/' + api_examples_get('uid') + '.json',
+          method: 'PUT',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#user_delete').click(function() {
+        $.ajax({
+          url: endpoint + '/user/' + api_examples_get('uid') + '.json',
+          method: 'DELETE',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('uid', '');
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#node_index').click(function() {
+        var params = {
+          parameters: {
+            type: ['article', 'page'],
+            status: 1
+          },
+          fields: 'nid,vid,title,status,body',
+          sort: 'title',
+          direction: 'ASC',
+          page: 0,
+          pagesize: 5
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          cache: false,
+          url: endpoint + '/entity_node.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#node_create').click(function() {
+        var time = (new Date).getTime();
+        var data = {
+          title: 'Sample page - ' + time,
+          body: {
+            und: [
+              {
+                value: 'This is a sample page.',
+                format: 'filtered_html'
+              }
+            ]
+          },
+          type: 'page',
+          language: 'und'
+        };
+        $.ajax({
+          url: endpoint + '/node.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('nid', response.nid);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#node_retrieve').click(function() {
+        var params = {
+          fields: 'nid,vid,title,status,body'
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          cache: false,
+          url: endpoint + '/entity_node/' + api_examples_get('nid') + '.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#node_update').click(function() {
+        var time = (new Date).getTime();
+        var data = {
+          title: 'Sample page - ' + time,
+          body: {
+            und: [
+              {
+                value: 'This is a sample page.',
+                format: 'filtered_html'
+              }
+            ]
+          },
+          type: 'page',
+          language: 'und'
+        };
+        $.ajax({
+          url: endpoint + '/node/' + api_examples_get('nid') + '.json',
+          method: 'PUT',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#node_delete').click(function() {
+        $.ajax({
+          url: endpoint + '/node/' + api_examples_get('nid') + '.json',
+          method: 'DELETE',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('nid', '');
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#file_index').click(function() {
+        var params = {
+          parameters: {
+            status: 1
+          },
+          fields: 'fid,file,filename,filemime,filesize,status,timestamp,uri,uri_full',
+          sort: 'fid',
+          direction: 'ASC',
+          page: 0,
+          pagesize: 5
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          url: endpoint + '/entity_file.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#file_create').click(function() {
+        var time = (new Date).getTime();
+        var fileName = 'Sample file - ' + time;
+        var data = {
+          file: 'ZmFrZQ==',
+          filename: fileName,
+          filepath: 'public://' + fileName
+        };
+        $.ajax({
+          url: endpoint + '/file.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('fid', response.fid);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#file_retrieve').click(function() {
+        var params = {
+          fields: 'fid,file,filename,filemime,filesize,status,timestamp,uri,uri_full'
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          cache: false,
+          url: endpoint + '/entity_file/' + api_examples_get('fid') + '.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#file_update').click(function() {
+        var time = (new Date).getTime();
+        var fileName = 'Sample file - ' + time;
+        var data = {
+          filename: fileName,
+          filepath: 'public://' + fileName
+        };
+        $.ajax({
+          url: endpoint + '/file/' + api_examples_get('fid') + '.json',
+          method: 'PUT',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#file_delete').click(function() {
+        $.ajax({
+          url: endpoint + '/file/' + api_examples_get('fid') + '.json',
+          method: 'DELETE',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('fid', '');
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#taxonomy_vocabulary_index').click(function() {
+        var params = {
+          parameters: {
+            hierarchy: 0
+          },
+          fields: 'vid,name,machine_name,description,hierarchy,module,weight',
+          sort: 'vid',
+          direction: 'ASC',
+          page: 0,
+          pagesize: 5
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_vocabulary.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_vocabulary_create').click(function() {
+        var time = (new Date).getTime();
+        var name = 'Sample vocabulary - ' + time;
+        var data = {
+          name: name,
+          machine_name: 'sample_vocabulary_' + time,
+          description: 'Sample vocabulary - ' + time
+        };
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_vocabulary.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('vid', response.vid);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_vocabulary_retrieve').click(function() {
+        var params = {
+          fields: 'vid,name,machine_name,description,hierarchy,module,weight',
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          cache: false,
+          url: endpoint + '/entity_taxonomy_vocabulary/' + api_examples_get('vid') + '.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_vocabulary_update').click(function() {
+        var time = (new Date).getTime();
+        var name = 'Sample vocabulary - ' + time;
+        var data = {
+          vid: api_examples_get('vid'),
+          name: name,
+          machine_name: 'sample_vocabulary_' + time,
+          description: 'Sample vocabulary - ' + time
+        };
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_vocabulary/' + api_examples_get('vid') + '.json',
+          method: 'PUT',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_vocabulary_delete').click(function() {
+        var data = {
+          vid: api_examples_get('vid')
+        };
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_vocabulary/' + api_examples_get('vid') + '.json',
+          method: 'DELETE',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('vid', '');
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      ////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////
+
+      $('#taxonomy_term_index').click(function() {
+        var params = {
+          parameters: {
+            vid: 1
+          },
+          fields: 'vid,tid,name,vocabulary_machine_name,is_new,weight,parent',
+          sort: 'tid',
+          direction: 'ASC',
+          page: 0,
+          pagesize: 5
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_term.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          beforeSend: function(xhr) {
+
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_term_create').click(function() {
+        var time = (new Date).getTime();
+        var name = 'Sample term - ' + time;
+        var data = {
+          vid: 1,
+          name: name
+        };
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_term.json',
+          method: 'POST',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('tid', response.tid);
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_term_retrieve').click(function() {
+        var params = {
+          fields: 'vid,tid,name,vocabulary_machine_name,is_new,weight,parent',
+        };
+        var paramsStr = jQuery.param(params);
+        $.ajax({
+          cache: false,
+          url: endpoint + '/entity_taxonomy_term/' + api_examples_get('tid') + '.json' + '?' + paramsStr,
+          method: 'GET',
+          dataType: 'json',
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+          },
+          success: function(response){
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_term_update').click(function() {
+        var time = (new Date).getTime();
+        var name = 'Sample term - ' + time;
+        var data = {
+          vid: 1,
+          tid: api_examples_get('tid'),
+          name: name
+        };
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_term/' + api_examples_get('tid') + '.json',
+          method: 'PUT',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+      $('#taxonomy_term_delete').click(function() {
+        var data = {
+          tid: api_examples_get('tid')
+        };
+        $.ajax({
+          url: endpoint + '/entity_taxonomy_term/' + api_examples_get('tid') + '.json',
+          method: 'DELETE',
+          dataType: 'json',
+          xhrFields: {
+            withCredentials: true
+          },
+          data: JSON.stringify(data),
+          beforeSend: function(xhr) {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRF-Token', api_examples_get('token'));
+          },
+          success: function(response) {
+            api_examples_set('tid', '');
+            response = JSON.stringify(response, null, 4);
+            $("#output").html(response);
+          },
+          error: function(request, status, error) {
+            $("#output").html(request.responseText);
+          }
+        });
+      });
+
+    });
+  </script>
+  <style>
+    .api-list {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      padding: 15px;
+      width: 250px;
+      background: #ededed;
+      overflow: auto;
+    }
+    .api-pre {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      bottom: 0;
+      padding: 15px;
+      width: auto;
+      background: #fff;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="api-list">
+    <div><button id="user_token">User Token</button></div>
+    <div><button id="user_login">User Login</button></div>
+    <div><button id="user_logout">User Logout</button></div>
+    <br>
+
+    <div><button id="system_connect">System Connect</button></div>
+    <br>
+
+    <div><button id="user_index">User Index</button></div>
+    <div><button id="user_register">User Register</button></div>
+    <div><button id="user_create">User Create</button></div>
+    <div><button id="user_retrieve">User Retrieve</button></div>
+    <div><button id="user_update">User Update</button></div>
+    <div><button id="user_delete">User Delete</button></div>
+    <br>
+
+    <div><button id="node_index">Node Index</button></div>
+    <div><button id="node_create">Node Create</button></div>
+    <div><button id="node_retrieve">Node Retrieve</button></div>
+    <div><button id="node_update">Node Update</button></div>
+    <div><button id="node_delete">Node Delete</button></div>
+    <br>
+
+    <div><button id="file_index">File Index</button></div>
+    <div><button id="file_create">File Create</button></div>
+    <div><button id="file_retrieve">File Retrieve</button></div>
+    <div><button id="file_update">File Update</button></div>
+    <div><button id="file_delete">File Delete</button></div>
+    <br>
+
+    <div><button id="taxonomy_vocabulary_index">Taxonomy Vocabulary Index</button></div>
+    <div><button id="taxonomy_vocabulary_create">Taxonomy Vocabulary Create</button></div>
+    <div><button id="taxonomy_vocabulary_retrieve">Taxonomy Vocabulary Retrieve</button></div>
+    <div><button id="taxonomy_vocabulary_update">Taxonomy Vocabulary Update</button></div>
+    <div><button id="taxonomy_vocabulary_delete">Taxonomy Vocabulary Delete</button></div>
+    <br>
+
+    <div><button id="taxonomy_term_index">Taxonomy Term Index</button></div>
+    <div><button id="taxonomy_term_create">Taxonomy Term Create</button></div>
+    <div><button id="taxonomy_term_retrieve">Taxonomy Term Retrieve</button></div>
+    <div><button id="taxonomy_term_update">Taxonomy Term Update</button></div>
+    <div><button id="taxonomy_term_delete">Taxonomy Term Delete</button></div>
+  </div>
+
+  <div class="api-pre">
+    <h2>Response</h2>
+    <pre>
+      <div id="output"></div>
+    </pre>
+  </div>
+</body>
+</html>
