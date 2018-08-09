@@ -621,7 +621,7 @@ $.ajax({
 var time = (new Date).getTime();
 var name = 'Sample vocabulary - ' + time;
 var data = {
-  vid: api_examples_get('vid'),
+  vid: 1,
   name: name,
   machine_name: 'sample_vocabulary_' + time,
   description: 'Sample vocabulary - ' + time
@@ -650,7 +650,7 @@ $.ajax({
 ## Taxonomy Vocabulary Delete
 ```
 var data = {
-  vid: api_examples_get('vid')
+  vid: 1
 };
 $.ajax({
   url: endpoint + '/entity_taxonomy_vocabulary/1.json',
@@ -763,7 +763,7 @@ var time = (new Date).getTime();
 var name = 'Sample term - ' + time;
 var data = {
   vid: 1,
-  tid: api_examples_get('tid'),
+  tid: 1,
   name: name
 };
 $.ajax({
@@ -790,7 +790,7 @@ $.ajax({
 ## Taxonomy Term Delete
 ```
 var data = {
-  tid: api_examples_get('tid')
+  tid: 1
 };
 $.ajax({
   url: endpoint + '/entity_taxonomy_term/1.json',
