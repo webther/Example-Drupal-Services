@@ -3,8 +3,258 @@
 <head>
   <meta charset="UTF-8">
   <title>Drupal 7 Services usages in RxJS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/5.5.6/Rx.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    var endpoint = 'https://dev-npmjs-drupal7.pantheonsite.io/api/rest/v1';
+
+    function api_examples_set(name, value) {
+      name = 'api_examples_' + name;
+      localStorage.setItem(name, value);
+    }
+
+    function api_examples_get(name) {
+      name = 'api_examples_' + name;
+      return localStorage.getItem(name)
+    }
+
+    var userToken$ = Rx.Observable.create((observer) => {
+      axios({
+        method: 'post',
+        url: endpoint + '/user/token.json',
+        withCredentials: true
+      })
+        .then(function (response) {
+          var data = response.data;
+          var token = data.token;
+          api_examples_set('token', token);
+          response = JSON.stringify(data, null, 4);
+          $("#output").html(response);
+          observer.next(token);
+          observer.complete();
+        })
+        .catch(function (error) {
+          var data = error.response.data;
+          error = JSON.stringify(data, null, 4);
+          $("#output").html(error);
+          observer.error(data);
+        });
+    });
+
+    var userLogin$ = Rx.Observable.create((observer) => {
+      var data = {
+        username: 'api',
+        password: 'api'
+      };
+      axios({
+        method: 'post',
+        url: endpoint + '/user/login.json',
+        data: data,
+        withCredentials: true
+      })
+        .then(function (response) {
+          var data = response.data;
+          api_examples_set('token', data.token);
+          response = JSON.stringify(data, null, 4);
+          $("#output").html(response);
+          observer.next(data);
+          observer.complete();
+        })
+        .catch(function (error) {
+          var data = error.response.data;
+          error = JSON.stringify(data, null, 4);
+          $("#output").html(error);
+          observer.error(data);
+        });
+    });
+
+    var userLogout$ = Rx.Observable.create((observer) => {
+      axios({
+        method: 'post',
+        url: endpoint + '/user/logout.json',
+        responseType: 'json',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': api_examples_get('token')
+        },
+        withCredentials: true
+      })
+        .then(function (response) {
+          var data = response.data;
+          api_examples_set('token', '');
+          response = JSON.stringify(data, null, 4);
+          $("#output").html(response);
+          observer.next(data);
+          observer.complete();
+        })
+        .catch(function (error) {
+          var data = error.response.data;
+          error = JSON.stringify(data, null, 4);
+          $("#output").html(error);
+          observer.error(data);
+        });
+    });
+
+    var systemConnect$ = Rx.Observable.create((observer) => {
+      axios({
+        method: 'post',
+        url: endpoint + '/system/connect.json',
+        responseType: 'json',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': api_examples_get('token')
+        },
+        withCredentials: true
+      })
+        .then(function (response) {
+          var data = response.data;
+          response = JSON.stringify(data, null, 4);
+          $("#output").html(response);
+          observer.next(data);
+          observer.complete();
+        })
+        .catch(function (error) {
+          var data = error.response.data;
+          error = JSON.stringify(data, null, 4);
+          $("#output").html(error);
+          observer.error(data);
+        });
+    });
+
+    $(document).ready(function() {
+      $('#user_token').on('click', function () {
+        userToken$.subscribe({
+          next: (data) => {
+            console.log('[data] => ', data);
+          },
+          error: (data) => {
+            console.log('[error] => ', data);
+          },
+          complete: (data) => {
+            console.log('[complete] => ', data);
+          },
+        });
+      });
+
+      $('#user_login').on('click', function () {
+        userLogin$.subscribe({
+          next: (data) => {
+            console.log('[data] => ', data);
+          },
+          error: (data) => {
+            console.log('[error] => ', data);
+          },
+          complete: (data) => {
+            console.log('[complete] => ', data);
+          },
+        });
+      });
+
+      $('#user_logout').on('click', function () {
+        userLogout$.subscribe({
+          next: (data) => {
+            console.log('[data] => ', data);
+          },
+          error: (data) => {
+            console.log('[error] => ', data);
+          },
+          complete: (data) => {
+            console.log('[complete] => ', data);
+          },
+        });
+      });
+
+      $('#system_connect').on('click', function () {
+        systemConnect$.subscribe({
+          next: (data) => {
+            console.log('[data] => ', data);
+          },
+          error: (data) => {
+            console.log('[error] => ', data);
+          },
+          complete: (data) => {
+            console.log('[complete] => ', data);
+          },
+        });
+      });
+    });
+  </script>
+  <style>
+    .api-list {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      padding: 15px;
+      width: 250px;
+      background: #ededed;
+      overflow: auto;
+    }
+    .api-pre {
+      position: fixed;
+      top: 0;
+      left: 280px;
+      right: 0;
+      bottom: 0;
+      padding: 15px;
+      width: auto;
+      background: #fff;
+      overflow: auto;
+    }
+  </style>
 </head>
 <body>
-  TODO
+  <div class="api-list">
+    <div><button id="user_token">User Token</button></div>
+    <div><button id="user_login">User Login</button></div>
+    <div><button id="user_logout">User Logout</button></div>
+    <br>
+
+    <div><button id="system_connect">System Connect</button></div>
+    <br>
+
+    <!--<div><button id="user_index">User Index</button></div>-->
+    <!--<div><button id="user_register">User Register</button></div>-->
+    <!--<div><button id="user_create">User Create</button></div>-->
+    <!--<div><button id="user_retrieve">User Retrieve</button></div>-->
+    <!--<div><button id="user_update">User Update</button></div>-->
+    <!--<div><button id="user_delete">User Delete</button></div>-->
+    <!--<br>-->
+
+    <!--<div><button id="node_index">Node Index</button></div>-->
+    <!--<div><button id="node_create">Node Create</button></div>-->
+    <!--<div><button id="node_retrieve">Node Retrieve</button></div>-->
+    <!--<div><button id="node_update">Node Update</button></div>-->
+    <!--<div><button id="node_delete">Node Delete</button></div>-->
+    <!--<br>-->
+
+    <!--<div><button id="file_index">File Index</button></div>-->
+    <!--<div><button id="file_create">File Create</button></div>-->
+    <!--<div><button id="file_retrieve">File Retrieve</button></div>-->
+    <!--<div><button id="file_update">File Update</button></div>-->
+    <!--<div><button id="file_delete">File Delete</button></div>-->
+    <!--<br>-->
+
+    <!--<div><button id="taxonomy_vocabulary_index">Taxonomy Vocabulary Index</button></div>-->
+    <!--<div><button id="taxonomy_vocabulary_create">Taxonomy Vocabulary Create</button></div>-->
+    <!--<div><button id="taxonomy_vocabulary_retrieve">Taxonomy Vocabulary Retrieve</button></div>-->
+    <!--<div><button id="taxonomy_vocabulary_update">Taxonomy Vocabulary Update</button></div>-->
+    <!--<div><button id="taxonomy_vocabulary_delete">Taxonomy Vocabulary Delete</button></div>-->
+    <!--<br>-->
+
+    <!--<div><button id="taxonomy_term_index">Taxonomy Term Index</button></div>-->
+    <!--<div><button id="taxonomy_term_create">Taxonomy Term Create</button></div>-->
+    <!--<div><button id="taxonomy_term_retrieve">Taxonomy Term Retrieve</button></div>-->
+    <!--<div><button id="taxonomy_term_update">Taxonomy Term Update</button></div>-->
+    <!--<div><button id="taxonomy_term_delete">Taxonomy Term Delete</button></div>-->
+  </div>
+
+  <div class="api-pre">
+    <h2>Response</h2>
+    <pre>
+          <div id="output"></div>
+        </pre>
+  </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 ## About
-These are the examples to show you how to use the Drupal 7 Services in different languages such as PHP, jQuery, Axios and RxJS.
+These are the examples to show you how to use the Drupal 7 Services in different languages such as jQuery, Axios and RxJS.
 
 ## How to setup?
 Install `Services`, `Services Entity` and `REST Server` modules then go to the page /admin/structure/services to config a new service.
@@ -434,7 +434,6 @@ api/*|<mirror>|POST,PUT,PATCH,GET,DELETE|Authentication,Accept,Content-Type,X-CS
 Config the proper permissions for each role at page /admin/people/permissions.
 
 ## Examples
-* PHP
 * jQuery
 * Axios
 * RxJS

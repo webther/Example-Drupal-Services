@@ -15,7 +15,6 @@
       }
 
       function api_examples_get(name) {
-        //return service[name];
         name = 'api_examples_' + name;
         return localStorage.getItem(name)
       }
@@ -80,6 +79,7 @@
         })
           .then(function (response) {
             var data = response.data;
+            api_examples_set('token', '');
             response = JSON.stringify(data, null, 4);
             $("#output").html(response);
           })
